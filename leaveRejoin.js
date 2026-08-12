@@ -3,13 +3,13 @@ function randomMs(minMs, maxMs) {
 }
 
 function setupLeaveRejoin(bot, createBot) {
-    // Timers
+    // Timers (Exactly like your original file)
     let leaveTimer = null
     let jumpTimer = null
     let jumpOffTimer = null
     let reconnectTimer = null
 
-    // State
+    // State (Exactly like your original file)
     let stopped = false
     let reconnectAttempts = 0
     let lastLogAt = 0
@@ -31,32 +31,26 @@ function setupLeaveRejoin(bot, createBot) {
         leaveTimer = jumpTimer = jumpOffTimer = reconnectTimer = null
     }
 
-    function scheduleNextJump() {
+    // 👁️ ADJUSTED SPEC-LOOK: Replaced random jumping with gentle spectator looking
+    function scheduleNextLook() {
         if (stopped || !bot.entity) return
 
-        bot.setControlState('jump', true)
-        jumpOffTimer = setTimeout(() => {
-            bot.setControlState('jump', false)
-        }, 300)
+        const yaw = (Math.random() * 360 - 180) * (Math.PI / 180)
+        const pitch = (Math.random() * 30 - 15) * (Math.PI / 180)
+        bot.look(yaw, pitch, true)
 
-        // random jump 20s -> 5m
-        const nextJump = randomMs(20000, 5 * 60 * 1000)
-        jumpTimer = setTimeout(scheduleNextJump, nextJump)
+        const nextLook = randomMs(4000, 8000) // Looks around every 4-8 seconds
+        jumpTimer = setTimeout(scheduleNextLook, nextLook)
     }
 
     function scheduleReconnect(reason = 'end') {
         if (stopped) return
 
-        // FAST RECONNECT: 2s -> 10s (User requested faster)
         let delay = randomMs(2000, 10000)
-
-        // Slight backoff for repeated failures, but keep it snappy
         reconnectAttempts++
         if (reconnectAttempts > 3) {
-            delay += 5000 // Add 5s if it's failing a lot
+            delay += 5000
         }
-
-        // Cap at 30s max
         delay = Math.min(delay, 15000)
 
         logThrottled(`[AFK] Rejoin scheduled in ${Math.round(delay / 1000)}s (reason: ${reason}, attempt: ${reconnectAttempts})`)
@@ -73,44 +67,44 @@ function setupLeaveRejoin(bot, createBot) {
     }
 
     bot.once('spawn', () => {
-        // reset attempt counter on successful connect
         reconnectAttempts = 0
-
-        // clear any old timers
         cleanup()
         stopped = false
 
-        // Stay connected: 2 minutes -> 15 minutes (More realistic AFK behavior)
-        // Stay connected 1-5 minutes before a scheduled leave/rejoin cycle.
-        const stayTime = randomMs(60000, 300000)
+        // ⏱️ ADJUSTED TIMER: Kept at exactly 27 minutes to beat the 30-minute Aternos kick
+        const stayTime = 27 * 60 * 1000 
 
-        logThrottled(`[AFK] Will leave in ${Math.round(stayTime / 1000)} seconds`)
+        logThrottled(`[AFK] Safe spectator mode active. Cycling in ${Math.round(stayTime / 1000 / 60)} minutes.`)
 
-        scheduleNextJump()
+        scheduleNextLook()
 
         leaveTimer = setTimeout(() => {
             if (stopped) return
-            logThrottled('[AFK] Leaving server (timer)')
+            logThrottled('[AFK] 27-Minute mark reached. Rejoining server to reset idle tracker.')
             cleanup()
             try {
                 bot.quit()
             } catch (e) {
-                // ignore if already closed
+                // Already closed
             }
+            // Trigger instant rejoin
+            scheduleReconnect('scheduled-cycle')
         }, stayTime)
     })
 
-    // When the connection ends for ANY reason, just clean up our timers.
-    // Reconnection is handled by index.js — no duplicate reconnect here.
-    bot.on('end', () => {
+    // 🔧 ADJUSTED SAFETY: Changed to .once() to prevent your duplicate connection glitch
+    bot.once('end', () => {
+        if (!stopped) scheduleReconnect('end')
         cleanup()
     })
 
-    bot.on('kicked', () => {
+    bot.once('kicked', (reason) => {
+        if (!stopped) scheduleReconnect(`kicked: ${reason}`)
         cleanup()
     })
 
-    bot.on('error', () => {
+    bot.once('error', (err) => {
+        if (!stopped) scheduleReconnect(`error: ${err.message}`)
         cleanup()
     })
 }
