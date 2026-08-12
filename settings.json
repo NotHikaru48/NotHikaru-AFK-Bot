@@ -38,7 +38,7 @@
     "max-reconnect-delay": 120000
   },
   "movement": {
-    "enabled": false,
+    "enabled": true,
     "circle-walk": {
       "enabled": false,
       "radius": 4,
@@ -49,7 +49,7 @@
       "interval": 5000
     },
     "random-jump": {
-      "enabled": true,
+      "enabled": false,
       "interval": 10000
     }
   },
@@ -72,8 +72,8 @@
     "enabled": false,
     "webhookUrl": "YOUR_DISCORD_WEBHOOK_URL_HERE",
     "events": {
-      "connect": false,
-      "disconnect": false,
+      "connect": true,
+      "disconnect": true,
       "chat": false
     }
   },
