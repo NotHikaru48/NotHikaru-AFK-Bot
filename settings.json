@@ -23,8 +23,8 @@
       "password": "Hikaru@AFKBOT01"
     },
     "anti-afk": {
-      "enabled": false,
-      "sneak": false
+      "enabled": true,
+      "sneak": true
     },
     "chat-messages": {
       "enabled": false,
@@ -49,7 +49,7 @@
       "interval": 5000
     },
     "random-jump": {
-      "enabled": false,
+      "enabled": true,
       "interval": 10000
     }
   },
@@ -72,7 +72,7 @@
     "enabled": false,
     "webhookUrl": "YOUR_DISCORD_WEBHOOK_URL_HERE",
     "events": {
-      "connect": true,
+      "connect": false,
       "disconnect": false,
       "chat": false
     }
