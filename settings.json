@@ -1,13 +1,13 @@
 {
-  "name": "AFK Bot",
+  "name": "HikaruBot",
   "bot-account": {
-    "username": "AFKBOT",
+    "username": "HikaruBot",
     "password": "",
     "type": "offline"
   },
   "server": {
-    "ip": "troublemaker-gang.aternos.me",
-    "port": 38173,
+    "ip": "troublemakers21.play.hosting",
+    "port": 58387,
     "version": "",
     "try-creative": false
   },
@@ -19,11 +19,11 @@
   },
   "utils": {
     "auto-auth": {
-      "enabled": true,
-      "password": "Hikaru@AFKBOT01"
+      "enabled": false,
+      "password": ""
     },
     "anti-afk": {
-      "enabled": true,
+      "enabled": false,
       "sneak": false
     },
     "chat-messages": {
@@ -38,7 +38,7 @@
     "max-reconnect-delay": 120000
   },
   "movement": {
-    "enabled": true,
+    "enabled": false,
     "circle-walk": {
       "enabled": false,
       "radius": 4,
